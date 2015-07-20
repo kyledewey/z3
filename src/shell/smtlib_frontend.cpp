@@ -140,3 +140,7 @@ unsigned read_smtlib2_commands(char const * file_name) {
     return result ? 0 : 1;
 }
 
+void set_global_context(cmd_context& context) {
+  g_cmd_context = &context;
+}
+

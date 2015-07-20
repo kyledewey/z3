@@ -16,6 +16,8 @@ Author:
 Revision History:
 
 --*/
+#include <iostream>
+#include <sstream>
 #include"smt2parser.h"
 #include"smt2scanner.h"
 #include"stack.h"
@@ -2519,3 +2521,15 @@ bool parse_smt2_commands(cmd_context & ctx, std::istream & is, bool interactive,
     return p();
 }
 
+void process_smt_command(cmd_context& context, std::string& line, params_ref const & params) {
+  std::istringstream line_as_stream(line);
+
+  smt2::parser p(context, line_as_stream, false, params);
+  try {
+    if (!p()) {
+      std::cout << "---ERROR DETECTED---" << std::endl;
+    }
+  } catch (z3_exception& ex) {
+    std::cout << ex.msg() << "---ERROR DETECTED---" << std::endl;
+  }
+}
