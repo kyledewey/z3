@@ -2527,9 +2527,9 @@ void process_smt_command(cmd_context& context, std::string& line, params_ref con
   smt2::parser p(context, line_as_stream, false, params);
   try {
     if (!p()) {
-      std::cout << "---ERROR DETECTED---" << std::endl;
+      std::cout << std::endl << "---ERROR DETECTED---" << std::endl;
     }
   } catch (z3_exception& ex) {
-    std::cout << ex.msg() << "---ERROR DETECTED---" << std::endl;
+    std::cout << std::endl << ex.msg() << std::endl << "---ERROR DETECTED---" << std::endl;
   }
 }
