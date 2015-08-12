@@ -9,7 +9,8 @@
 
 #include"memory_manager.h"
 #include"env_params.h"
-
+#include"gparams.h"
+#include "symbol.h"
 #include <string>
 
 using namespace std;
@@ -53,6 +54,11 @@ ReadLineResult read_line(cmd_context& context, istream& input) {
 bool read_file_incrementally(istream& input) {
   cmd_context ctx;
 
+  // TODO: this is a workaround for this bug:
+  // https://github.com/Z3Prover/z3/issues/190
+  symbol logic("QF_UFBV");
+  ctx.set_logic(logic);
+
   ctx.set_solver_factory(mk_smt_strategic_solver_factory());
   ctx.set_interpolating_solver_factory(mk_smt_solver_factory());
 
@@ -83,6 +89,11 @@ void read_files(istream& input) {
 int main(int argc, char** argv) {
   memory::initialize(0);
   memory::exit_when_out_of_memory(true, "ERROR: out of memory");
+
+  // Handle division by zero soundly with respect to SMT-LIB
+  gparams::set("rewriter.hi_div0", "false");
+  gparams::set("old_simplify.bv.hi_div0", "false");
+  
   env_params::updt_params();
   read_files(cin);
   return 0;
