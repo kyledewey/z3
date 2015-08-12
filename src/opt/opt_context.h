@@ -68,7 +68,6 @@ namespace opt {
         public opt_wrapper, 
         public pareto_callback,
         public maxsat_context {
-        struct free_func_visitor;
         typedef map<symbol, maxsmt*, symbol_hash_proc, symbol_eq_proc> map_t;
         typedef map<symbol, unsigned, symbol_hash_proc, symbol_eq_proc> map_id;
         typedef vector<std::pair<inf_eps, inf_eps> > bounds_t;
@@ -188,7 +187,7 @@ namespace opt {
         virtual proof* get_proof() { return 0; }
         virtual void get_labels(svector<symbol> & r) {}
         virtual void get_unsat_core(ptr_vector<expr> & r) {}
-        virtual std::string reason_unknown() const { return std::string("unknown"); }
+        virtual std::string reason_unknown() const;
 
         virtual void display_assignment(std::ostream& out);
         virtual bool is_pareto() { return m_pareto.get() != 0; }
@@ -244,6 +243,9 @@ namespace opt {
         bool is_maxsat(expr* fml, expr_ref_vector& terms, 
                        vector<rational>& weights, rational& offset, bool& neg, 
                        symbol& id, unsigned& index);
+        void  purify(app_ref& term);
+        app* purify(filter_model_converter_ref& fm, expr* e);
+        bool is_mul_const(expr* e);
         expr* mk_maximize(unsigned index, app* t);
         expr* mk_minimize(unsigned index, app* t);
         expr* mk_maxsat(unsigned index, unsigned num_fmls, expr* const* fmls);

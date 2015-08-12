@@ -40,6 +40,7 @@ namespace smt {
         m_max_cexs(1),
         m_iteration_idx(0),
         m_curr_model(0),
+        m_cancel(false),
         m_new_instances_bindings(m) {
     }
 
@@ -169,11 +170,9 @@ namespace smt {
                 if (sk_term != 0) {
                     sk_value = sk_term;
                 }
-                else {
-                    if (m_manager.is_model_value(sk_value))
-                        return false;
-                }
             }
+            if (m_manager.is_model_value(sk_value))
+                return false;
             bindings.set(num_decls - i - 1, sk_value);
         }
         
