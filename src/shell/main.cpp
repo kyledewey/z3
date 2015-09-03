@@ -54,11 +54,6 @@ ReadLineResult read_line(cmd_context& context, istream& input) {
 bool read_file_incrementally(istream& input) {
   cmd_context ctx;
 
-  // TODO: this is a workaround for this bug:
-  // https://github.com/Z3Prover/z3/issues/190
-  symbol logic("QF_UFBV");
-  ctx.set_logic(logic);
-
   ctx.set_solver_factory(mk_smt_strategic_solver_factory());
   ctx.set_interpolating_solver_factory(mk_smt_solver_factory());
 
