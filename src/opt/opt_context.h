@@ -50,9 +50,7 @@ namespace opt {
         virtual solver& get_solver() = 0;           // retrieve solver object (SAT or SMT solver)
         virtual ast_manager& get_manager() = 0;      
         virtual params_ref& params() = 0;
-        virtual void enable_sls(expr_ref_vector const& soft, weights_t& weights) = 0; // stochastic local search 
-        virtual void set_enable_sls(bool f) = 0;    // overwrite whether SLS is enabled.
-        virtual void set_soft_assumptions() = 0;    // configure SAT solver to skip assumptions assigned by unit-propagation  
+        virtual void enable_sls(bool force) = 0;              // stochastic local search 
         virtual symbol const& maxsat_engine() const = 0; // retrieve maxsat engine configuration parameter.
         virtual void get_base_model(model_ref& _m) = 0;  // retrieve model from initial satisfiability call.
         virtual smt::context& smt_context() = 0;    // access SMT context for SMT based MaxSMT solver (wmax requires SMT core)
@@ -216,9 +214,7 @@ namespace opt {
         virtual solver& get_solver();
         virtual ast_manager& get_manager() { return this->m; }
         virtual params_ref& params() { return m_params; }
-        virtual void enable_sls(expr_ref_vector const& soft, weights_t& weights);
-        virtual void set_enable_sls(bool f) { m_enable_sls = f; }
-        virtual void set_soft_assumptions();
+        virtual void enable_sls(bool force);
         virtual symbol const& maxsat_engine() const { return m_maxsat_engine; }
         virtual void get_base_model(model_ref& _m);
 
@@ -283,6 +279,8 @@ namespace opt {
 
 
         void validate_lex();
+
+        void display_benchmark();
 
 
         // pareto
