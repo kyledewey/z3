@@ -42,7 +42,7 @@ ReadLineResult read_line(cmd_context& context, istream& input) {
       return FILE_COMPLETE;
     } else {
       process_smt_command(context, line);
-      cout << FILE_OR_INPUT_DELIMETER << endl;
+      cout << endl << FILE_OR_INPUT_DELIMETER << endl;
       return MORE_TO_FILE;
     }
   } else {
