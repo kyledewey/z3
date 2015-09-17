@@ -961,20 +961,14 @@ void mpf_manager::sqrt(mpf_rounding_mode rm, mpf const & x, mpf & o) {
 
     TRACE("mpf_dbg", tout << "X = " << to_string(x) << std::endl;);
 
-    if (is_nan(x) || is_ninf(x))
+    if (is_nan(x))
         mk_nan(x.ebits, x.sbits, o);
     else if (is_pinf(x))
         set(o, x);
-    else if (x.sign) {
-        if (!m_mpz_manager.is_zero(x.significand))
-            mk_nan(x.ebits, x.sbits, o);
-        else
-            mk_nzero(x.ebits, x.sbits, o);
-    }
-    else if (is_pzero(x))
-        mk_pzero(x.ebits, x.sbits, o);
-    else if (is_nzero(x))
-        mk_nzero(x.ebits, x.sbits, o);
+    else if (is_zero(x))
+        set(o, x);
+    else if (x.sign)
+        mk_nan(x.ebits, x.sbits, o);
     else {
         o.ebits = x.ebits;
         o.sbits = x.sbits;
@@ -1177,6 +1171,19 @@ void mpf_manager::to_sbv_mpq(mpf_rounding_mode rm, const mpf & x, scoped_mpq & o
 
     m_mpq_manager.set(o, z);
     if (x.sign) m_mpq_manager.neg(o);
+}
+
+void mpf_manager::to_ieee_bv_mpz(const mpf & x, scoped_mpz & o) {
+    SASSERT(!is_nan(x) && !is_inf(x));
+    SASSERT(exp(x) < INT_MAX);
+
+    unsigned sbits = x.get_sbits();
+    unsigned ebits = x.get_ebits();
+    m_mpz_manager.set(o, sgn(x));
+    m_mpz_manager.mul2k(o, ebits);
+    m_mpz_manager.add(o, (int)exp(x), o);
+    m_mpz_manager.mul2k(o, sbits - 1);
+    m_mpz_manager.add(o, sig(x), o);
 }
 
 void mpf_manager::rem(mpf const & x, mpf const & y, mpf & o) {

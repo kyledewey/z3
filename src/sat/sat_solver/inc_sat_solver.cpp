@@ -58,7 +58,7 @@ class inc_sat_solver : public solver {
     proof_converter_ref m_pc;   
     model_converter_ref m_mc2;   
     expr_dependency_ref m_dep_core;
-    svector<double>       m_weights;
+    svector<double>     m_weights;
 
     typedef obj_map<expr, sat::literal> dep2asm_t;
 public:
@@ -69,8 +69,8 @@ public:
         m_asmsf(m),
         m_fmls_head(0),
         m_core(m), 
-        m_bb_rewriter(m, p),
         m_map(m),
+        m_bb_rewriter(m, p),
         m_num_scopes(0), 
         m_dep_core(m) {
         m_params.set_bool("elim_vars", false);
