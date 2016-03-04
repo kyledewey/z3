@@ -79,9 +79,9 @@ bool read_file_incrementally(istream& input) {
 }
 
 void read_files(istream& input) {
-  do {
+  while (read_file_incrementally(input)) {
     cout << endl << READY << endl;
-  } while (read_file_incrementally(input));
+  }
 }
 
 int main(int argc, char** argv) {
