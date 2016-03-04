@@ -16,6 +16,8 @@ Author:
 Revision History:
 
 --*/
+#include <iostream>
+#include <sstream>
 #include"smt2parser.h"
 #include"smt2scanner.h"
 #include"stack.h"
@@ -415,7 +417,9 @@ namespace smt2 {
             if (m_ctx.exit_on_error()) {
                 exit(1);
             }
-        }
+
+	    std::cout << std::endl << "---ERROR DETECTED---" << std::endl;
+	}
 
         void error(char const * msg) {
             error(m_scanner.get_line(), m_scanner.get_pos(), msg);
@@ -430,6 +434,7 @@ namespace smt2 {
             else {
                 m_ctx.regular_stream() << "(error : " << escaped(msg, true) << "\")" << std::endl;
             }
+	    std::cout << std::endl << "---ERROR DETECTED---" << std::endl;
         }
         
         void unknown_sort(symbol id, char const* context = "") {
@@ -2707,3 +2712,17 @@ bool parse_smt2_commands(cmd_context & ctx, std::istream & is, bool interactive,
     return p();
 }
 
+void process_smt_command(cmd_context& context, std::string& line, params_ref const & params) {
+  std::istringstream line_as_stream(line);
+
+  smt2::parser p(context, line_as_stream, false, params);
+  try {
+    if (!p()) {
+      std::cout << std::endl << "---ERROR DETECTED---" << std::endl;
+    }
+  } catch (z3_exception& ex) {
+    std::cout << std::endl << ex.msg() << std::endl << "---ERROR DETECTED---" << std::endl;
+  } catch (...) {
+    std::cout << std::endl << "---ERROR DETECTED---" << std::endl;
+  }
+}

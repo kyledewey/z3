@@ -19,8 +19,6 @@ Revision History:
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
-#include <stdlib.h>
-
 void enable_assertions(bool f);
 bool assertions_enabled();
 
