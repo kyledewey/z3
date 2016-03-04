@@ -20,6 +20,7 @@ using namespace std;
 bool                g_display_statistics  = false;
 
 const string FILE_OR_INPUT_DELIMETER = "---FINISHED---";
+const string READY = "---READY---";
 
 // Protocol:
 // -Read line as SMT command
@@ -78,7 +79,9 @@ bool read_file_incrementally(istream& input) {
 }
 
 void read_files(istream& input) {
-  while (read_file_incrementally(input)) {}
+  do {
+    cout << endl << READY << endl;
+  } while (read_file_incrementally(input));
 }
 
 int main(int argc, char** argv) {
