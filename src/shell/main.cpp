@@ -87,7 +87,6 @@ int main(int argc, char** argv) {
 
   // Handle division by zero soundly with respect to SMT-LIB
   gparams::set("rewriter.hi_div0", "false");
-  gparams::set("old_simplify.bv.hi_div0", "false");
   
   env_params::updt_params();
   read_files(cin);
