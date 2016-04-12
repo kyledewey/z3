@@ -19,8 +19,12 @@ Revision History:
 #ifndef SMTLIB_FRONTEND_H_
 #define SMTLIB_FRONTEND_H_
 
+#include "cmd_util.h"
+
 unsigned read_smtlib_file(char const * benchmark_file);
 unsigned read_smtlib2_commands(char const * command_file);
+
+void set_global_context(cmd_context& context);
 
 #endif /* SMTLIB_FRONTEND_H_ */
 
