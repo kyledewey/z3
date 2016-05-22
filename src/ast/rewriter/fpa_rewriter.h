@@ -89,6 +89,8 @@ public:
     br_status mk_to_ubv_unspecified(unsigned ebits, unsigned sbits, unsigned with, expr_ref & result);
     br_status mk_to_sbv_unspecified(unsigned ebits, unsigned sbits, unsigned with, expr_ref & result);
     br_status mk_to_real_unspecified(unsigned ebits, unsigned sbits, expr_ref & result);
+
+    br_status mk_bvwrap(expr * arg, expr_ref & result);
 };
 
 #endif

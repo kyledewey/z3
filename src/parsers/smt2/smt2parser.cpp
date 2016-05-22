@@ -405,7 +405,7 @@ namespace smt2 {
         void check_float(char const * msg) { if (!curr_is_float()) throw parser_exception(msg); }
 
         void error(unsigned line, unsigned pos, char const * msg) {
-            m_ctx.reset_cancel();
+            m_ctx.set_cancel(false);
             if (use_vs_format()) {
                 m_ctx.diagnostic_stream() << "Z3(" << line << ", " << pos << "): ERROR: " << msg;
                 if (msg[strlen(msg)-1] != '\n')
@@ -478,6 +478,7 @@ namespace smt2 {
 
         void parse_sexpr() {
             unsigned stack_pos  = sexpr_stack().size();
+            (void)stack_pos;
             unsigned num_frames = 0;
             do {
                 unsigned line = m_scanner.get_line();
@@ -636,6 +637,7 @@ namespace smt2 {
 
         void parse_psort() {
             unsigned stack_pos  = psort_stack().size();
+            (void)stack_pos;
             unsigned num_frames = 0;
             do {
                 if (curr_is_identifier()) {
@@ -698,6 +700,7 @@ namespace smt2 {
 
         void parse_sort(char const* context) {
             unsigned stack_pos  = sort_stack().size();
+            (void)stack_pos;
             unsigned num_frames = 0;
             do {
                 if (curr_is_identifier()) {
@@ -1610,7 +1613,7 @@ namespace smt2 {
             unsigned j = begin_pats;
             for (unsigned i = begin_pats; i < end_pats; i++) {
                 expr * pat = pattern_stack().get(i);
-                if (!pat_validator()(num_decls, pat)) {
+                if (!pat_validator()(num_decls, pat, m_scanner.get_line(), m_scanner.get_pos())) {
                     if (!ignore_bad_patterns())
                         throw parser_exception("invalid pattern");
                     continue;

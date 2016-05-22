@@ -52,7 +52,7 @@ import math
 
 if sys.version < '3':
     def _is_int(v):
-        return isinstance(v, int) or isinstance(v, long)
+        return isinstance(v, (int, long))    
 else:
     def _is_int(v):
         return isinstance(v, int)
@@ -95,7 +95,7 @@ def append_log(s):
 
 def to_symbol(s, ctx=None):
     """Convert an integer or string into a Z3 symbol."""
-    if isinstance(s, int):
+    if _is_int(s):
         return Z3_mk_int_symbol(_get_ctx(ctx).ref(), s)
     else:
         return Z3_mk_string_symbol(_get_ctx(ctx).ref(), s)
@@ -3468,7 +3468,7 @@ def is_bv_value(a):
     """
     return is_bv(a) and _is_numeral(a.ctx, a.as_ast())
 
-def BV2Int(a):
+def BV2Int(a, is_signed=False):
     """Return the Z3 expression BV2Int(a).
 
     >>> b = BitVec('b', 3)
@@ -3477,6 +3477,10 @@ def BV2Int(a):
     >>> x = Int('x')
     >>> x > BV2Int(b)
     x > BV2Int(b)
+    >>> x > BV2Int(b, is_signed=False)
+    x > BV2Int(b)
+    >>> x > BV2Int(b, is_signed=True)
+    x > If(b < 0, BV2Int(b) - 8, BV2Int(b))
     >>> solve(x > BV2Int(b), b == 1, x < 3)
     [b = 1, x = 2]
     """
@@ -3484,7 +3488,7 @@ def BV2Int(a):
         _z3_assert(is_bv(a), "Z3 bit-vector expression expected")
     ctx = a.ctx
     ## investigate problem with bv2int
-    return ArithRef(Z3_mk_bv2int(ctx.ref(), a.as_ast(), 0), ctx)
+    return ArithRef(Z3_mk_bv2int(ctx.ref(), a.as_ast(), is_signed), ctx)
 
 def BitVecSort(sz, ctx=None):
     """Return a Z3 bit-vector sort of the given size. If `ctx=None`, then the global context is used.
@@ -3627,7 +3631,7 @@ def Extract(high, low, a):
             return SeqRef(Z3_mk_seq_extract(s.ctx_ref(), s.as_ast(), offset.as_ast(), length.as_ast()), s.ctx)
     if __debug__:
         _z3_assert(low <= high, "First argument must be greater than or equal to second argument")
-        _z3_assert(isinstance(high, int) and high >= 0 and isinstance(low, int) and low >= 0, "First and second arguments must be non negative integers")
+        _z3_assert(_is_int(high) and high >= 0 and _is_int(low) and low >= 0, "First and second arguments must be non negative integers")
         _z3_assert(is_bv(a), "Third argument must be a Z3 Bitvector expression")
     return BitVecRef(Z3_mk_extract(a.ctx_ref(), high, low, a.as_ast()), a.ctx)
 
@@ -3849,7 +3853,7 @@ def SignExt(n, a):
     fe
     """
     if __debug__:
-        _z3_assert(isinstance(n, int), "First argument must be an integer")
+        _z3_assert(_is_int(n), "First argument must be an integer")
         _z3_assert(is_bv(a), "Second argument must be a Z3 Bitvector expression")
     return BitVecRef(Z3_mk_sign_ext(a.ctx_ref(), n, a.as_ast()), a.ctx)
 
@@ -3876,7 +3880,7 @@ def ZeroExt(n, a):
     8
     """
     if __debug__:
-        _z3_assert(isinstance(n, int), "First argument must be an integer")
+        _z3_assert(_is_int(n), "First argument must be an integer")
         _z3_assert(is_bv(a), "Second argument must be a Z3 Bitvector expression")
     return BitVecRef(Z3_mk_zero_ext(a.ctx_ref(), n, a.as_ast()), a.ctx)
 
@@ -3899,7 +3903,7 @@ def RepeatBitVec(n, a):
     aaaa
     """
     if __debug__:
-        _z3_assert(isinstance(n, int), "First argument must be an integer")
+        _z3_assert(_is_int(n), "First argument must be an integer")
         _z3_assert(is_bv(a), "Second argument must be a Z3 Bitvector expression")
     return BitVecRef(Z3_mk_repeat(a.ctx_ref(), n, a.as_ast()), a.ctx)
 
@@ -4580,7 +4584,7 @@ class ParamsRef:
         name_sym = to_symbol(name, self.ctx)
         if isinstance(val, bool):
             Z3_params_set_bool(self.ctx.ref(), self.params, name_sym, val)
-        elif isinstance(val, int):
+        elif _is_int(val):
             Z3_params_set_uint(self.ctx.ref(), self.params, name_sym, val)
         elif isinstance(val, float):
             Z3_params_set_double(self.ctx.ref(), self.params, name_sym, val)
@@ -5516,7 +5520,10 @@ class ModelRef(Z3PPObject):
             decl = decl.decl()
         try:
             if decl.arity() == 0:
-                r = _to_expr_ref(Z3_model_get_const_interp(self.ctx.ref(), self.model, decl.ast), self.ctx)
+                _r = Z3_model_get_const_interp(self.ctx.ref(), self.model, decl.ast)
+                if _r.value is None:
+                    return None
+                r = _to_expr_ref(_r, self.ctx)
                 if is_as_array(r):
                     return self.get_interp(get_as_array_func(r))
                 else:
@@ -5627,7 +5634,7 @@ class ModelRef(Z3PPObject):
         x -> 1
         f -> [1 -> 0, else -> 0]
         """
-        if isinstance(idx, int):
+        if _is_int(idx):
             if idx >= len(self):
                 raise IndexError
             num_consts = Z3_model_get_num_consts(self.ctx.ref(), self.model)
@@ -9310,7 +9317,7 @@ def IndexOf(s, substr, offset):
     ctx = _get_ctx2(s, substr, ctx)
     s = _coerce_seq(s, ctx)
     substr = _coerce_seq(substr, ctx)
-    if isinstance(offset, int):
+    if _is_int(offset):
         offset = IntVal(offset, ctx)
     return SeqRef(Z3_mk_seq_index(s.ctx_ref(), s.as_ast(), substr.as_ast(), offset.as_ast()), s.ctx)
 
