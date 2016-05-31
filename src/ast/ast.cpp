@@ -1420,7 +1420,7 @@ ast_manager::~ast_manager() {
                 std::cout << to_sort(a)->get_name() << "\n";
             }
             else {
-                std::cout << mk_ll_pp(a, *this, false);
+                std::cout << mk_ll_pp(a, *this, false) << "id: " << a->get_id() << "\n";
             }
         }
     });
@@ -1574,6 +1574,7 @@ bool ast_manager::are_equal(expr * a, expr * b) const {
     }
     return false;
 }
+
 
 bool ast_manager::are_distinct(expr* a, expr* b) const {
     if (is_app(a) && is_app(b)) {
