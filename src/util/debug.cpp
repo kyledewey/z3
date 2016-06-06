@@ -69,6 +69,11 @@ bool is_debug_enabled(const char * tag) {
     return g_enabled_debug_tags->contains(const_cast<char *>(tag));
 }
 
+void throw_assertion_violation() {
+  std::cout << std::endl << "---ERROR DETECTED---" << std::endl;
+  throw default_exception("assertion violation");
+}
+  
 #ifndef _WINDOWS
 void invoke_gdb() {
     char buffer[1024];
@@ -92,7 +97,7 @@ void invoke_gdb() {
             return;
         case 't':
         case 'T':
-            throw default_exception("assertion violation");
+	    throw_assertion_violation();
         case 'G':
         case 'g':
             sprintf(buffer, "gdb -nw /proc/%d/exe %d", getpid(), getpid());
